@@ -16,14 +16,14 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-codec:commons-codec:1.15")
     implementation("org.jsoup:jsoup:1.15.3")
-
+    implementation("com.fasterxml.jackson.core:jackson-core:2.14.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.1")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.14.1")
     implementation("ch.qos.logback:logback-core:1.4.5")
     implementation("org.slf4j:slf4j-api:2.0.6")
     testImplementation("ch.qos.logback:logback-classic:1.4.5")
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
     testCompileOnly("org.projectlombok:lombok:1.18.24")
