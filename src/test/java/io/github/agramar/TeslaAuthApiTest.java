@@ -1,7 +1,7 @@
 package io.github.agramar;
 
 import io.github.agramar.model.RefreshTokenRequest;
-import io.github.agramar.model.TeslaAuthToken;
+import io.github.agramar.model.AuthToken;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class TeslaAuthApiTest {
     @Test
     void testGenAccessToken() {
 
-        TeslaAuthToken token = teslaAuthApi.getAccessToken(EMAIL.getValue(), PASSWORD.getValue());
+        AuthToken token = teslaAuthApi.getAccessToken(EMAIL.getValue(), PASSWORD.getValue());
 
         log.trace("token : {}", token);
 
@@ -36,7 +36,7 @@ class TeslaAuthApiTest {
             .refreshToken(REFRESH_TOKEN.getValue())
             .build();
 
-        TeslaAuthToken token = teslaAuthApi.refreshAccessToken(refreshTokenRequest);
+        AuthToken token = teslaAuthApi.refreshAccessToken(refreshTokenRequest);
 
         log.trace("token : {}", token);
 

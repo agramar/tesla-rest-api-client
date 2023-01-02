@@ -2,7 +2,7 @@ package io.github.agramar;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.agramar.model.RefreshTokenRequest;
-import io.github.agramar.model.TeslaAuthToken;
+import io.github.agramar.model.AuthToken;
 import io.github.agramar.util.MediaType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -25,7 +25,7 @@ public class TeslaAuthApi {
     /**
      * TODO Auth API Not working
      */
-    public TeslaAuthToken getAccessToken(final String email, final String password) {
+    public AuthToken getAccessToken(final String email, final String password) {
         log.trace("email : {}", email);
         log.trace("password : {}", password);
 
@@ -39,10 +39,10 @@ public class TeslaAuthApi {
 
         // TODO 2. Obtain authorization code
         // TODO 3. Exchange authorization code for bearer token
-        return new TeslaAuthToken("eyJaccess", "eyJrefresh", 300, "", "", "");
+        return new AuthToken("eyJaccess", "eyJrefresh", 300, "", "", "");
     }
 
-    public TeslaAuthToken refreshAccessToken(RefreshTokenRequest refreshTokenRequest) throws Exception {
+    public AuthToken refreshAccessToken(RefreshTokenRequest refreshTokenRequest) throws Exception {
 
         if (refreshTokenRequest == null)
             throw new IllegalArgumentException();
@@ -68,6 +68,6 @@ public class TeslaAuthApi {
         String responseBody = response.body();
         log.trace("response body : {}", responseBody);
 
-        return objectMapper.readValue(responseBody, TeslaAuthToken.class);
+        return objectMapper.readValue(responseBody, AuthToken.class);
     }
 }

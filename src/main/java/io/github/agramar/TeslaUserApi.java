@@ -3,8 +3,8 @@ package io.github.agramar;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.agramar.model.TeslaResponse;
-import io.github.agramar.model.TeslaUserProfile;
-import io.github.agramar.model.TeslaUserVaultProfile;
+import io.github.agramar.model.UserProfile;
+import io.github.agramar.model.UserVaultProfile;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
@@ -27,7 +27,7 @@ public class TeslaUserApi {
             .header("Authorization", "Bearer " + accessToken);
     }
 
-    public TeslaResponse<TeslaUserProfile> getMe() throws Exception {
+    public TeslaResponse<UserProfile> getMe() throws Exception {
 
         if (accessToken == null || accessToken.isBlank())
             throw new IllegalArgumentException("access token is blank");
@@ -50,7 +50,7 @@ public class TeslaUserApi {
         return objectMapper.readValue(responseBody, new TypeReference<>() {});
     }
 
-    public TeslaResponse<TeslaUserVaultProfile> getVaultProfile() throws Exception {
+    public TeslaResponse<UserVaultProfile> getVaultProfile() throws Exception {
 
         if (accessToken == null || accessToken.isBlank())
             throw new IllegalArgumentException("access token is blank");

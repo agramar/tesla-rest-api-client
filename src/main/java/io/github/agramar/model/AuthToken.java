@@ -2,7 +2,7 @@ package io.github.agramar.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record TeslaAuthToken(
+public record AuthToken(
     @JsonProperty("access_token") String accessToken,
     @JsonProperty("refresh_token") String refreshToken,
     @JsonProperty("expires_in") int expiresIn,

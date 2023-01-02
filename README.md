@@ -6,4 +6,3 @@
 
 ## Reference
 - https://tesla-api.timdorr.com
-- https://github.com/jonahwh/tesla-api-client
