@@ -2,6 +2,7 @@ package io.github.agramar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.agramar.model.TeslaResponse;
 import io.github.agramar.model.UserProfile;
 import io.github.agramar.model.UserVaultProfile;
@@ -12,6 +13,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static io.github.agramar.util.HttpUtils.STRING_RESPONSE_HANDLER;
+
 @Slf4j
 public class TeslaUserApi {
 
@@ -19,7 +22,7 @@ public class TeslaUserApi {
     private final String BASE_URL = "https://owner-api.teslamotors.com/api/1/users";
     private final HttpClient httpClient = HttpClient.newBuilder().build();
     private final HttpRequest.Builder requestBuilder;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
 
     public TeslaUserApi(String accessToken) {
         this.accessToken = accessToken;
@@ -38,7 +41,7 @@ public class TeslaUserApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -47,7 +50,8 @@ public class TeslaUserApi {
         if (response.statusCode() != 200)
             throw new Exception("http request fail : " + response.statusCode());
 
-        return objectMapper.readValue(responseBody, new TypeReference<>() {});
+        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
     }
 
     public TeslaResponse<UserVaultProfile> getVaultProfile() throws Exception {
@@ -61,7 +65,7 @@ public class TeslaUserApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -70,6 +74,7 @@ public class TeslaUserApi {
         if (response.statusCode() != 200)
             throw new Exception("http request fail : " + response.statusCode());
 
-        return objectMapper.readValue(responseBody, new TypeReference<>() {});
+        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
     }
 }

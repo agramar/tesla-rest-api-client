@@ -2,6 +2,7 @@ package io.github.agramar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.agramar.model.TeslaResponse;
 import io.github.agramar.model.Vehicle;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
+import static io.github.agramar.util.HttpUtils.STRING_RESPONSE_HANDLER;
+
 @Slf4j
 public class TeslaVehiclesApi {
 
@@ -19,7 +22,7 @@ public class TeslaVehiclesApi {
     private final HttpRequest.Builder requestBuilder;
     private final String BASE_URL = "https://owner-api.teslamotors.com/api/1/vehicles";
     private final HttpClient httpClient = HttpClient.newBuilder().build();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
 
     public TeslaVehiclesApi(String accessToken) {
         this.accessToken = accessToken;
@@ -37,7 +40,7 @@ public class TeslaVehiclesApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -60,7 +63,7 @@ public class TeslaVehiclesApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();

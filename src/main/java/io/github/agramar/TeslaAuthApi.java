@@ -1,8 +1,9 @@
 package io.github.agramar;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.agramar.model.RefreshTokenRequest;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.agramar.model.AuthToken;
+import io.github.agramar.model.RefreshTokenRequest;
 import io.github.agramar.util.MediaType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -14,13 +15,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
 
+import static io.github.agramar.util.HttpUtils.STRING_RESPONSE_HANDLER;
+
 
 @Slf4j
 public class TeslaAuthApi {
 
     private final String BASE_URL = "https://auth.tesla.com/oauth2/v3";
     private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
 
     /**
      * TODO Auth API Not working
@@ -57,7 +60,7 @@ public class TeslaAuthApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
         log.trace("response : {}", response);
 
         if (response.statusCode() != 200) {
