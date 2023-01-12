@@ -1,12 +1,11 @@
 package io.github.agramar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.agramar.model.ChargeState;
-import io.github.agramar.model.TeslaResponse;
 import io.github.agramar.model.Vehicle;
+import io.github.agramar.model.response.TeslaRestResponse;
+import io.github.agramar.util.ObjectMapperHolder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
@@ -14,21 +13,21 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static io.github.agramar.util.HttpUtils.STRING_RESPONSE_HANDLER;
 
 @Slf4j
 public class TeslaVehiclesStateApi {
 
+    private final HttpClient httpClient;
     private final HttpRequest.Builder requestBuilder;
-    private final HttpClient httpClient = HttpClient.newBuilder().build();
-    private final ObjectMapper objectMapper = JsonMapper.builder()
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .findAndAddModules()
-        .build();
+    private final ObjectMapper mapper;
 
     public TeslaVehiclesStateApi(String accessToken) {
-        this.requestBuilder = HttpRequest.newBuilder()
-            .header("Authorization", "Bearer " + accessToken);
+        if (accessToken == null || accessToken.isBlank())
+            throw new IllegalArgumentException("access token is blank");
+
+        this.httpClient = HttpClient.newBuilder().build();
+        this.requestBuilder = HttpRequest.newBuilder().header("Authorization", "Bearer " + accessToken);
+        this.mapper = ObjectMapperHolder.INSTANCE.get();
     }
 
     private HttpRequest buildHttpRequest(Long id, String apiPath) {
@@ -38,11 +37,11 @@ public class TeslaVehiclesStateApi {
             .build();
     }
 
-    public TeslaResponse<Vehicle> getVehicleDate(Long id) throws Exception {
+    public TeslaRestResponse<Vehicle> getVehicleDate(Long id) throws Exception {
         HttpRequest request = buildHttpRequest(id, "vehicle_data");
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -50,15 +49,15 @@ public class TeslaVehiclesStateApi {
 
         if (response.statusCode() != 200)
             throw new Exception("http request fail : " + response.statusCode());
-        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        return mapper.readValue(responseBody, new TypeReference<>() {
         });
     }
 
-    public TeslaResponse<ChargeState> getChargeState(Long id) throws Exception {
+    public TeslaRestResponse<ChargeState> getChargeState(Long id) throws Exception {
         HttpRequest request = buildHttpRequest(id, "data_request/charge_state");
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -66,17 +65,17 @@ public class TeslaVehiclesStateApi {
 
         if (response.statusCode() != 200)
             throw new Exception("http request fail : " + response.statusCode());
-        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        return mapper.readValue(responseBody, new TypeReference<>() {
         });
     }
 
 
-    public TeslaResponse<Boolean> getMobileEnabled(Long id) throws Exception {
+    public TeslaRestResponse<Boolean> getMobileEnabled(Long id) throws Exception {
 
         HttpRequest request = buildHttpRequest(id, "mobile_enabled");
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -84,7 +83,7 @@ public class TeslaVehiclesStateApi {
 
         if (response.statusCode() != 200)
             throw new Exception("http request fail : " + response.statusCode());
-        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        return mapper.readValue(responseBody, new TypeReference<>() {
         });
     }
 }

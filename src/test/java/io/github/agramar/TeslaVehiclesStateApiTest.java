@@ -1,7 +1,7 @@
 package io.github.agramar;
 
 import io.github.agramar.model.ChargeState;
-import io.github.agramar.model.TeslaResponse;
+import io.github.agramar.model.response.TeslaRestResponse;
 import io.github.agramar.model.Vehicle;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,7 @@ class TeslaVehiclesStateApiTest {
 
     @Test
     void testGetVehicleDate() throws Exception {
-        TeslaResponse<Vehicle> response = vehiclesStateApi.getVehicleDate(id);
+        TeslaRestResponse<Vehicle> response = vehiclesStateApi.getVehicleDate(id);
 
         Vehicle vehicle = response.response();
         assertNotNull(vehicle);
@@ -44,7 +44,7 @@ class TeslaVehiclesStateApiTest {
 
     @Test
     void testGetChargeState() throws Exception {
-        TeslaResponse<ChargeState> response = vehiclesStateApi.getChargeState(id);
+        TeslaRestResponse<ChargeState> response = vehiclesStateApi.getChargeState(id);
 
         ChargeState chargeState = response.response();
         assertNotNull(chargeState);
@@ -52,7 +52,7 @@ class TeslaVehiclesStateApiTest {
 
     @Test
     void testGetMobileEnabled() throws Exception {
-        TeslaResponse<Boolean> response = vehiclesStateApi.getMobileEnabled(id);
+        TeslaRestResponse<Boolean> response = vehiclesStateApi.getMobileEnabled(id);
         assertNotNull(response.response());
     }
 }

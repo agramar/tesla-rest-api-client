@@ -1,4 +1,4 @@
-package io.github.agramar.model;
+package io.github.agramar.model.request;
 
 import lombok.Builder;
 
@@ -12,7 +12,7 @@ public record RefreshTokenRequest(
 ) {
     public RefreshTokenRequest {
         if (refreshToken == null || refreshToken.isBlank())
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("refreshToken can not be blank");
 
         if (grantType == null || grantType.isBlank())
             grantType = "refresh_token";

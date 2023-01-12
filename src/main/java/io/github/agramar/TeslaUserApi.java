@@ -2,10 +2,10 @@ package io.github.agramar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import io.github.agramar.model.TeslaResponse;
 import io.github.agramar.model.UserProfile;
 import io.github.agramar.model.UserVaultProfile;
+import io.github.agramar.model.response.TeslaRestResponse;
+import io.github.agramar.util.ObjectMapperHolder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
@@ -13,27 +13,22 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static io.github.agramar.util.HttpUtils.STRING_RESPONSE_HANDLER;
-
 @Slf4j
 public class TeslaUserApi {
 
-    private final String accessToken;
     private final String BASE_URL = "https://owner-api.teslamotors.com/api/1/users";
-    private final HttpClient httpClient = HttpClient.newBuilder().build();
+    private final HttpClient httpClient;
     private final HttpRequest.Builder requestBuilder;
-    private final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
+    private final ObjectMapper mapper;
+
 
     public TeslaUserApi(String accessToken) {
-        this.accessToken = accessToken;
-        this.requestBuilder = HttpRequest.newBuilder()
-            .header("Authorization", "Bearer " + accessToken);
+        this.httpClient = HttpClient.newBuilder().build();
+        this.requestBuilder = HttpRequest.newBuilder().header("Authorization", "Bearer " + accessToken);
+        this.mapper = ObjectMapperHolder.INSTANCE.get();
     }
 
-    public TeslaResponse<UserProfile> getMe() throws Exception {
-
-        if (accessToken == null || accessToken.isBlank())
-            throw new IllegalArgumentException("access token is blank");
+    public TeslaRestResponse<UserProfile> getMe() throws Exception {
 
         HttpRequest request = requestBuilder
             .uri(URI.create(BASE_URL + "/me"))
@@ -41,7 +36,7 @@ public class TeslaUserApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -50,14 +45,11 @@ public class TeslaUserApi {
         if (response.statusCode() != 200)
             throw new Exception("http request fail : " + response.statusCode());
 
-        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        return mapper.readValue(responseBody, new TypeReference<>() {
         });
     }
 
-    public TeslaResponse<UserVaultProfile> getVaultProfile() throws Exception {
-
-        if (accessToken == null || accessToken.isBlank())
-            throw new IllegalArgumentException("access token is blank");
+    public TeslaRestResponse<UserVaultProfile> getVaultProfile() throws Exception {
 
         HttpRequest request = requestBuilder
             .uri(URI.create(BASE_URL + "/vault_profile"))
@@ -65,7 +57,7 @@ public class TeslaUserApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
@@ -74,7 +66,7 @@ public class TeslaUserApi {
         if (response.statusCode() != 200)
             throw new Exception("http request fail : " + response.statusCode());
 
-        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        return mapper.readValue(responseBody, new TypeReference<>() {
         });
     }
 }

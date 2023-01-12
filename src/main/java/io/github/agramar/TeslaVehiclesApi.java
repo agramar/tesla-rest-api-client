@@ -2,77 +2,65 @@ package io.github.agramar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import io.github.agramar.model.TeslaResponse;
 import io.github.agramar.model.Vehicle;
+import io.github.agramar.model.response.TeslaRestResponse;
+import io.github.agramar.util.ObjectMapperHolder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.URI;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
-import static io.github.agramar.util.HttpUtils.STRING_RESPONSE_HANDLER;
-
 @Slf4j
 public class TeslaVehiclesApi {
 
-    private final String accessToken;
-    private final HttpRequest.Builder requestBuilder;
     private final String BASE_URL = "https://owner-api.teslamotors.com/api/1/vehicles";
-    private final HttpClient httpClient = HttpClient.newBuilder().build();
-    private final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
+    private final HttpClient httpClient;
+    private final HttpRequest.Builder requestBuilder;
+    private final ObjectMapper mapper;
 
     public TeslaVehiclesApi(String accessToken) {
-        this.accessToken = accessToken;
-        this.requestBuilder = HttpRequest.newBuilder()
-            .header("Authorization", "Bearer " + accessToken);
+
+        if (accessToken == null || accessToken.isBlank()) throw new IllegalArgumentException("access token is blank");
+
+        this.httpClient = HttpClient.newBuilder().build();
+        this.requestBuilder = HttpRequest.newBuilder().header("Authorization", "Bearer " + accessToken);
+        this.mapper = ObjectMapperHolder.INSTANCE.get();
     }
 
-    public TeslaResponse<List<Vehicle>> getVehicles() throws Exception {
-        if (accessToken == null || accessToken.isBlank())
-            throw new IllegalArgumentException("access token is blank");
+    public TeslaRestResponse<List<Vehicle>> getVehicles() throws Exception {
 
-        HttpRequest request = requestBuilder
-            .uri(URI.create(BASE_URL))
-            .GET()
-            .build();
+        HttpRequest request = requestBuilder.uri(URI.create(BASE_URL)).GET().build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
         log.trace("response body : {}", responseBody);
 
-        if (response.statusCode() != 200)
-            throw new Exception("http request fail : " + response.statusCode());
+        if (response.statusCode() != 200) throw new Exception("http request fail : " + response.statusCode());
 
-        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        return mapper.readValue(responseBody, new TypeReference<>() {
         });
     }
 
-    public TeslaResponse<Vehicle> getVehicle(long id) throws Exception {
-        if (accessToken == null || accessToken.isBlank())
-            throw new IllegalArgumentException("access token is blank");
+    public TeslaRestResponse<Vehicle> getVehicle(long id) throws Exception {
 
-        HttpRequest request = requestBuilder
-            .uri(URI.create(BASE_URL + "/" + id))
-            .GET()
-            .build();
+        HttpRequest request = requestBuilder.uri(URI.create(BASE_URL + "/" + id)).GET().build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response.body());
 
         String responseBody = response.body();
         log.trace("response body : {}", responseBody);
 
-        if (response.statusCode() != 200)
-            throw new Exception("http request fail : " + response.statusCode());
+        if (response.statusCode() != 200) throw new Exception("http request fail : " + response.statusCode());
 
-        return objectMapper.readValue(responseBody, new TypeReference<>() {
+        return mapper.readValue(responseBody, new TypeReference<>() {
         });
     }
 }

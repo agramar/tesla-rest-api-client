@@ -1,10 +1,10 @@
 package io.github.agramar;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.agramar.model.AuthToken;
-import io.github.agramar.model.RefreshTokenRequest;
+import io.github.agramar.model.request.RefreshTokenRequest;
 import io.github.agramar.util.MediaType;
+import io.github.agramar.util.ObjectMapperHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,15 +15,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
 
-import static io.github.agramar.util.HttpUtils.STRING_RESPONSE_HANDLER;
-
 
 @Slf4j
 public class TeslaAuthApi {
 
-    private final String BASE_URL = "https://auth.tesla.com/oauth2/v3";
-    private final HttpClient httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
-    private final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
+    private final HttpClient httpClient;
+    private final ObjectMapper mapper;
+
+    public TeslaAuthApi() {
+        this.httpClient = HttpClient.newBuilder().build();
+        this.mapper = ObjectMapperHolder.INSTANCE.get();
+    }
 
     /**
      * TODO Auth API Not working
@@ -47,6 +49,8 @@ public class TeslaAuthApi {
 
     public AuthToken refreshAccessToken(RefreshTokenRequest refreshTokenRequest) throws Exception {
 
+        final String BASE_URL = "https://auth.tesla.com/oauth2/v3";
+
         if (refreshTokenRequest == null)
             throw new IllegalArgumentException();
 
@@ -60,7 +64,7 @@ public class TeslaAuthApi {
             .build();
         log.trace("request : {}", request);
 
-        HttpResponse<String> response = httpClient.send(request, STRING_RESPONSE_HANDLER);
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         log.trace("response : {}", response);
 
         if (response.statusCode() != 200) {
@@ -71,6 +75,6 @@ public class TeslaAuthApi {
         String responseBody = response.body();
         log.trace("response body : {}", responseBody);
 
-        return objectMapper.readValue(responseBody, AuthToken.class);
+        return mapper.readValue(responseBody, AuthToken.class);
     }
 }

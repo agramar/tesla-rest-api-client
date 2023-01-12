@@ -1,8 +1,8 @@
-package io.github.agramar.model;
+package io.github.agramar.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record TeslaResponse<T>(
+public record TeslaRestResponse<T>(
     @JsonProperty("response")
     T response,
     @JsonProperty("count")

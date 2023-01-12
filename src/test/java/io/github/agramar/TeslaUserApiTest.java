@@ -1,6 +1,6 @@
 package io.github.agramar;
 
-import io.github.agramar.model.TeslaResponse;
+import io.github.agramar.model.response.TeslaRestResponse;
 import io.github.agramar.model.UserProfile;
 import io.github.agramar.model.UserVaultProfile;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ class TeslaUserApiTest {
     @Test
     void testGetMe() throws Exception {
 
-        TeslaResponse<UserProfile> response = teslaUserApi.getMe();
+        TeslaRestResponse<UserProfile> response = teslaUserApi.getMe();
 
         assertNotNull(response);
         assertNotNull(response.response());
@@ -33,7 +33,7 @@ class TeslaUserApiTest {
     @Test
     void testGetVaultProfile() throws Exception {
 
-        TeslaResponse<UserVaultProfile> response = teslaUserApi.getVaultProfile();
+        TeslaRestResponse<UserVaultProfile> response = teslaUserApi.getVaultProfile();
 
         assertNotNull(response);
         assertNotNull(response.response());
